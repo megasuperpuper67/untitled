@@ -1,2 +1,28 @@
-//в JdbcHelper добавлен метод DeleteExcursionById
-//также я закомментировал то что вставил с spring initializr
+//в Booking.java валидация разбита на отдельные методы
+//Stream API для расчета цены
+//EnumMap для вместимости комнат
+//Метод canTransitionTo() в статусах
+//в Client.java Заменил конкатенацию на String.format() для ошибок
+//Заменил цикл на String.repeat() для маскировки паспорта
+//Заменил if-else на цикл с массивами для определения скидки
+//Сделал clientId как final 
+//в HotelStay.java Заменил switch на Map.ofEntries() для множителей
+//Добавил константу DEFAULT_NIGHT_MULTIPLIER
+//Упростил метод calculateTotalPrice()
+//в Excursion.java
+//Выделил магические числа в константы для скидок и надбавок
+//в Flight.java
+//Выделил магическое число 1.3 в константу BAGGAGE_MULTIPLIER
+//в TourService.java
+//Переименовал поля from/to в validFrom/validTo для ясности
+//Улучшил читаемость метода isAvailableOn()
+//в RoomType.java
+//Добавил поля capacity, displayName, description
+//Создал конструктор для инициализации всех полей
+//Добавил недостающие типы TWIN и SUITE
+//Добавил метод canAccommodate() для проверки вместимости
+//в Main.java
+//Разбил монолитный код на отдельные методы
+//Создал helper-методы для создания тестовых объектов
+//Добавил тестирование RoomType
+//Добавил форматированный вывод с разделителями
