@@ -1,0 +1,2 @@
+//в JdbcHelper добавлен метод DeleteExcursionById
+//также я закомментировал то что вставил с spring initializr
