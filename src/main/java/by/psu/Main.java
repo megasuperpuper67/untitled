@@ -59,6 +59,20 @@ public class Main {
             var excursions = jdbcHelper.findAllExcursions();
             excursions.forEach(ex -> System.out.println("  " + ex));
 
+            // Delete excursion
+            System.out.println("\n--- Deleting excursion ---");
+
+            jdbcHelper.deleteExcursionById(newExcursion.getId());
+
+            System.out.println("Deleted excursion with id = "
+                    + newExcursion.getId());
+
+            // Проверка удаления
+            System.out.println("\n--- Excursions after delete ---");
+
+            jdbcHelper.findAllExcursions()
+                    .forEach(ex -> System.out.println("  " + ex));
+
             connection.commit();
             System.out.println("\nTransaction committed successfully!");
 
