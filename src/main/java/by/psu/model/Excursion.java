@@ -4,21 +4,19 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 
-public class Excursion extends TourService {
+public class Excursion extends TourService
+{
     private String guideName;
     private String excursionType;
     private boolean lunchIncluded;
 
-    private static final BigDecimal GROUP_DISCOUNT_THRESHOLD = BigDecimal.valueOf(10);
-    private static final BigDecimal GROUP_DISCOUNT_RATE = new BigDecimal("0.90");
-    private static final BigDecimal LUNCH_SURCHARGE_RATE = new BigDecimal("1.15");
-
+    // Конструктор по умолчанию
     public Excursion() {
         super();
     }
 
-    public Excursion(Integer id, String name, BigDecimal price,
-                     LocalDate from, LocalDate to,
+    // Конструктор со всеми параметрами
+    public Excursion(Integer id, String name, BigDecimal price, LocalDate from, LocalDate to,
                      String guideName, String excursionType, boolean lunchIncluded) {
         super(id, name, price, from, to);
         this.guideName = guideName;
@@ -26,6 +24,7 @@ public class Excursion extends TourService {
         this.lunchIncluded = lunchIncluded;
     }
 
+    // Геттеры и сеттеры
     public String getGuideName() {
         return guideName;
     }
@@ -51,30 +50,36 @@ public class Excursion extends TourService {
     }
 
     @Override
-    public BigDecimal calculateTotalPrice(int participants) {
-        BigDecimal participantsDecimal = BigDecimal.valueOf(participants);
-        BigDecimal totalPrice = getPrice().multiply(participantsDecimal);
+    public BigDecimal calculateTotalPrice(int participants)
+    {
+        BigDecimal totalPrice = getPrice().multiply(BigDecimal.valueOf(participants));
 
-        if (participants > GROUP_DISCOUNT_THRESHOLD.intValue()) {
-            totalPrice = totalPrice.multiply(GROUP_DISCOUNT_RATE);
+        // Скидка 10% при participants > 10
+        if (participants > 10) {
+            totalPrice = totalPrice.multiply(new BigDecimal("0.9"));
         }
 
+        // Если включен обед, добавляем 15%
         if (lunchIncluded) {
-            totalPrice = totalPrice.multiply(LUNCH_SURCHARGE_RATE);
+            totalPrice = totalPrice.multiply(new BigDecimal("1.15"));
         }
 
         return totalPrice;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         DecimalFormat df = new DecimalFormat("#,##0.00");
-        return String.format(
-                "Excursion{id=%d, name='%s', price=%s, period=%s to %s, " +
-                        "guide='%s', type='%s', lunchIncluded=%b}",
-                getId(), getName(),
-                getPrice() != null ? df.format(getPrice()) : "null",
-                getFrom(), getTo(), guideName, excursionType, lunchIncluded
-        );
+        return "Excursion{" +
+                "id=" + getId() +
+                ", name='" + getName() + '\'' +
+                ", price=" + (getPrice() != null ? df.format(getPrice()) : "null") +
+                ", from=" + getFrom() +
+                ", to=" + getTo() +
+                ", guideName='" + guideName + '\'' +
+                ", excursionType='" + excursionType + '\'' +
+                ", lunchIncluded=" + lunchIncluded +
+                '}';
     }
 }

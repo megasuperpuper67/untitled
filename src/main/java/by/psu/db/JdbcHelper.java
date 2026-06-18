@@ -20,20 +20,16 @@ public class JdbcHelper {
         var statement = conn.prepareStatement("SELECT * FROM public.excursion WHERE id = ?");
         statement.setInt(1, id);
         var result = statement.executeQuery();
-
-        if (result.next()) {
-            return new Excursion(
-                    result.getInt("id"),
-                    result.getString("name"),
-                    result.getBigDecimal("price"),
-                    result.getObject("from", LocalDate.class),
-                    result.getObject("to", LocalDate.class),
-                    result.getString("guide_name"),
-                    result.getString("excursion_type"),
-                    result.getBoolean("lunch_included"));
-        } else {
-            return null;
-        }
+        result.next();
+        return new Excursion(
+                result.getInt("id"),
+                result.getString("name"),
+                result.getBigDecimal("price"),
+                result.getObject("from", LocalDate.class),
+                result.getObject("to", LocalDate.class),
+                result.getString("guide_name"),
+                result.getString("excursion_type"),
+                result.getBoolean("lunch_included"));
     }
 
     public List<Excursion> findAllExcursions() throws SQLException {
@@ -76,11 +72,8 @@ public class JdbcHelper {
         statement.setBoolean(7, excursion.isLunchIncluded());
         statement.execute();
         var keys = statement.getGeneratedKeys();
-        if (keys.next()) {
-            return keys.getInt(1);
-        } else {
-            throw new SQLException("Creating excursion failed, no ID obtained.");
-        }
+        keys.next();
+        return keys.getInt(1);
     }
 
     private void updateExcursion(Excursion excursion) throws SQLException {
@@ -102,20 +95,6 @@ public class JdbcHelper {
         statement.setString(6, excursion.getExcursionType());
         statement.setBoolean(7, excursion.isLunchIncluded());
         statement.setInt(8, excursion.getId());
-        int affectedRows = statement.executeUpdate();
-        if (affectedRows == 0) {
-            throw new SQLException("Updating excursion failed, no rows affected for id=" + excursion.getId());
-        }
-    }
-
-    public void deleteExcursionById(int id) throws SQLException {
-        String sql = "DELETE FROM public.excursion WHERE id = ?";
-        try (var stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Удаление не выполнено: экскурсия с id=" + id + " не найдена.");
-            }
-        }
+        statement.executeUpdate();
     }
 }

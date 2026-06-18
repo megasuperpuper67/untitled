@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление экскурсиями</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="tour-service.js" defer></script>
+</head>
+<body class="bg-gray-100 p-8">
+<div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">🏛️ Панель управления экскурсиями</h1>
+
+    <form id="excursionForm" class="mb-8 p-5 bg-gray-50 rounded border border-gray-200 shadow-sm">
+        <h2 id="formTitle" class="text-lg font-semibold mb-4 text-gray-700">Добавить новую экскурсию</h2>
+        <input type="hidden" id="excursionId">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-600 mb-1">Название экскурсии</label>
+                <input type="text" id="name" placeholder="Например: Музей ВОВ, Минск" autocomplete="off" required
+                       class="w-full p-2 border rounded bg-white">
+            </div>
+            <div>
+                <label for="price" class="block text-sm font-medium text-gray-600 mb-1">Цена (руб.)</label>
+                <input type="number" id="price" step="0.01" placeholder="0.00" autocomplete="off" required
+                       class="w-full p-2 border rounded bg-white">
+            </div>
+            <div>
+                <label for="guideName" class="block text-sm font-medium text-gray-600 mb-1">ФИО гида</label>
+                <input type="text" id="guideName" placeholder="Иванов И.И." autocomplete="off" required
+                       class="w-full p-2 border rounded bg-white">
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+                <label for="from" class="block text-sm font-medium text-gray-600 mb-1">Дата начала</label>
+                <input type="date" id="from" required class="w-full p-2 border rounded bg-white">
+            </div>
+            <div>
+                <label for="to" class="block text-sm font-medium text-gray-600 mb-1">Дата окончания</label>
+                <input type="date" id="to" required class="w-full p-2 border rounded bg-white">
+            </div>
+            <div>
+                <label for="excursionType" class="block text-sm font-medium text-gray-600 mb-1">Тип экскурсии</label>
+                <select id="excursionType" required class="w-full p-2 border rounded bg-white">
+                    <option value="Групповая">Групповая</option>
+                    <option value="Индивидуальная">Индивидуальная</option>
+                    <option value="Автобусная">Автобусная</option>
+                    <option value="Пешеходная">Пешеходная</option>
+                </select>
+            </div>
+        </div>
+        <div class="flex items-center mb-6">
+            <input type="checkbox" id="lunchIncluded" class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+            <label for="lunchIncluded" class="ml-2 text-sm font-medium text-gray-700 select-none">Включен ли
+                обед</label>
+        </div>
+        <button type="submit" id="submitBtn"
+                class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition font-medium">Сохранить
+        </button>
+        <button type="button" id="cancelBtn"
+                class="hidden bg-gray-500 text-white px-5 py-2 rounded hover:bg-gray-600 transition ml-2 font-medium">
+            Отмена
+        </button>
+    </form>
+
+    <h2 class="text-lg font-semibold mb-4 text-gray-700">Список экскурсий</h2>
+    <div class="overflow-x-auto rounded border border-gray-200">
+        <table class="w-full text-left border-collapse bg-white">
+            <thead>
+            <tr class="bg-gray-100 text-gray-700 border-b border-gray-200 text-sm">
+                <th class="p-3 font-semibold text-center">ID</th>
+                <th class="p-3 font-semibold text-center">Название</th>
+                <th class="p-3 font-semibold text-center">Цена</th>
+                <th class="p-3 font-semibold text-center">Период</th>
+                <th class="p-3 font-semibold text-center">Гид</th>
+                <th class="p-3 font-semibold text-center">Тип</th>
+                <th class="p-3 font-semibold text-center">Обед</th>
+                <th class="p-3 font-semibold text-center">Действия</th>
+            </tr>
+            </thead>
+            <tbody id="excursionsTableBody" class="text-gray-600 text-sm">
+            <!-- Данные загружаются через JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

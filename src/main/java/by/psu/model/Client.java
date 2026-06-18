@@ -1,13 +1,16 @@
 package by.psu.model;
 
-import by.psu.exception.TourServiceValidationException;
-
 import java.math.BigDecimal;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class Client {
+
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+\\d{10,15}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+    );
+
     private final UUID clientId;
     private String fullName;
     private String email;
@@ -15,26 +18,61 @@ public class Client {
     private String passportNumber;
     private int loyaltyPoints;
 
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^[\\w.+\\-]+@[\\w.\\-]+$"
-    );
-
-    private static final Pattern PHONE_PATTERN = Pattern.compile(
-            "^\\+\\d{10,15}$"
-    );
-
-    private static final int PASSPORT_LENGTH = 10;
-    private static final int MIN_NAME_PARTS = 2;
-    private static final int MIN_PART_LENGTH = 2;
-
-    public Client(String fullName, String email, String phone,
-                  String passportNumber, int loyaltyPoints) {
+    public Client(String fullName, String email, String phone, String passportNumber, int loyaltyPoints) {
         this.clientId = UUID.randomUUID();
+
         setFullName(fullName);
         setEmail(email);
         setPhone(phone);
         setPassportNumber(passportNumber);
         setLoyaltyPoints(loyaltyPoints);
+    }
+
+    public static boolean validateString(String fullName) {
+        if (fullName == null) return false;
+
+        String[] words = fullName.trim().split("\\s+");
+        if (words.length < 2) return false;
+
+        for (String word : words) {
+            if (word.length() < 2) return false;
+        }
+        return true;
+    }
+
+    private int getLoyaltyTier(int points) {
+        if (points < 0) return 0;
+        if (points < 100) return 0;
+        if (points < 500) return 1;
+        if (points < 1000) return 2;
+        if (points < 5000) return 3;
+        return 4;
+    }
+
+    public BigDecimal getDiscountRate() {
+        return switch (getLoyaltyTier(loyaltyPoints)) {
+            case 1 -> BigDecimal.valueOf(5);
+            case 2 -> BigDecimal.valueOf(10);
+            case 3 -> BigDecimal.valueOf(15);
+            case 4 -> BigDecimal.valueOf(20);
+            default -> BigDecimal.ZERO;
+        };
+    }
+
+    public void addLoyaltyPoints(int points) {
+        if (points < 0) {
+            throw new TourServiceValidationException(
+                    String.format("points=%d (количество добавляемых баллов не может быть отрицательным)", points)
+            );
+        }
+        this.loyaltyPoints += points;
+    }
+
+    public String getMaskedPassportNumber() {
+        if (passportNumber == null || passportNumber.length() < 4) {
+            return "****";
+        }
+        return "*".repeat(passportNumber.length() - 4) + passportNumber.substring(passportNumber.length() - 4);
     }
 
     public UUID getClientId() {
@@ -46,28 +84,12 @@ public class Client {
     }
 
     public void setFullName(String fullName) {
-        Objects.requireNonNull(fullName, "fullName cannot be null");
-
-        String trimmed = fullName.trim();
-        String[] parts = trimmed.split("\\s+");
-
-        if (parts.length < MIN_NAME_PARTS) {
+        if (!validateString(fullName)) {
             throw new TourServiceValidationException(
-                    String.format("Full name '%s' must contain at least %d words",
-                            trimmed, MIN_NAME_PARTS)
+                    String.format("fullName=%s (должно содержать минимум 2 слова, каждое от 2 символов)", fullName)
             );
         }
-
-        for (String part : parts) {
-            if (part.length() < MIN_PART_LENGTH) {
-                throw new TourServiceValidationException(
-                        String.format("Each name part must be at least %d characters, got '%s'",
-                                MIN_PART_LENGTH, part)
-                );
-            }
-        }
-
-        this.fullName = trimmed;
+        this.fullName = fullName;
     }
 
     public String getEmail() {
@@ -77,7 +99,7 @@ public class Client {
     public void setEmail(String email) {
         if (email == null || !EMAIL_PATTERN.matcher(email).matches()) {
             throw new TourServiceValidationException(
-                    String.format("Invalid email format: '%s'", email)
+                    String.format("email=%s (некорректный формат email)", email)
             );
         }
         this.email = email;
@@ -90,7 +112,7 @@ public class Client {
     public void setPhone(String phone) {
         if (phone == null || !PHONE_PATTERN.matcher(phone).matches()) {
             throw new TourServiceValidationException(
-                    String.format("Phone must start with '+' and contain 10-15 digits, got '%s'", phone)
+                    String.format("phone=%s (должен начинаться с + и содержать от 10 до 15 цифр)", phone)
             );
         }
         this.phone = phone;
@@ -101,70 +123,30 @@ public class Client {
     }
 
     public void setPassportNumber(String passportNumber) {
-        if (passportNumber == null || passportNumber.length() != PASSPORT_LENGTH) {
+        if (passportNumber == null || passportNumber.length() != 10) {
             throw new TourServiceValidationException(
-                    String.format("Passport must be exactly %d characters, got %s",
-                            PASSPORT_LENGTH, passportNumber)
+                    String.format("passportNumber=%s (должен быть не null и содержать ровно 10 символов)", passportNumber)
             );
         }
         this.passportNumber = passportNumber;
     }
 
     public int getLoyaltyPoints() {
-        return loyaltyPoints;
-    }
+        return loyaltyPoints;}
 
     public void setLoyaltyPoints(int loyaltyPoints) {
         if (loyaltyPoints < 0) {
             throw new TourServiceValidationException(
-                    String.format("Loyalty points cannot be negative, got %d", loyaltyPoints)
+                    String.format("loyaltyPoints=%d (не может быть отрицательным)", loyaltyPoints)
             );
         }
         this.loyaltyPoints = loyaltyPoints;
     }
-
-    public void addLoyaltyPoints(int points) {
-        setLoyaltyPoints(this.loyaltyPoints + points);
-    }
-
-    public BigDecimal getDiscountRate() {
-        final int[] thresholds = {5000, 1000, 500, 100};
-        final BigDecimal[] rates = {
-                new BigDecimal("0.20"),
-                new BigDecimal("0.15"),
-                new BigDecimal("0.10"),
-                new BigDecimal("0.05")
-        };
-
-        for (int i = 0; i < thresholds.length; i++) {
-            if (loyaltyPoints >= thresholds[i]) {
-                return rates[i];
-            }
-        }
-
-        return BigDecimal.ZERO;
-    }
-
-    public String getMaskedPassportNumber() {
-        if (passportNumber == null || passportNumber.length() < 4) {
-            return "****";
-        }
-
-        int visibleCount = 4;
-        int maskedCount = passportNumber.length() - visibleCount;
-
-        return "*".repeat(maskedCount) +
-                passportNumber.substring(maskedCount);
-    }
-
-    @Override
-    public String toString() {
-        return String.format(
-                "Client{id=%s, name='%s', email='%s', phone='%s', " +
-                        "passport='%s', points=%d, discount=%.0f%%}",
-                clientId, fullName, email, phone,
-                getMaskedPassportNumber(), loyaltyPoints,
-                getDiscountRate().multiply(new BigDecimal("100"))
-        );
-    }
 }
+
+
+
+
+
+
+

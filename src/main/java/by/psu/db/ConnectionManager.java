@@ -13,9 +13,9 @@ public class ConnectionManager implements AutoCloseable {
             Class.forName("org.postgresql.Driver");
             var props = loadProperties();
             this.connection = DriverManager.getConnection(
-                    props.getProperty("url"),
-                    props.getProperty("user"),
-                    props.getProperty("password"));
+                    props.getProperty("db.url"),
+                    props.getProperty("db.user"),
+                    props.getProperty("db.password"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
