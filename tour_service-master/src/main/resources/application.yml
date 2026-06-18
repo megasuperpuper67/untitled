@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: tour-service
+    version: 1.0.0
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://postgres:5432/tour-service
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
